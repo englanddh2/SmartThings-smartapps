@@ -21,10 +21,10 @@
 import groovy.time.*
 
 definition(
-  name: "Laundry Monitor On Power Consumption",
+  name: "Clothes Washer Monitor On Power Consumption",
   namespace: "englanddh2",
   author: "Don England",
-  description: "Using a switch with power monitor capability, monitor the laundry cycle and alert when it's done.",
+  description: "Using a switch with power monitor capability, monitor the clothes washer cycle and alert when it's done.",
   category: "Green Living",
   iconUrl: "https://s3.amazonaws.com/smartthings-device-icons/Appliances/appliances8-icn.png",
   iconX2Url: "https://s3.amazonaws.com/smartthings-device-icons/Appliances/appliances8-icn@2x.png")
