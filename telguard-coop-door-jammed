@@ -1,0 +1,72 @@
+/**
+ *  Telguard Chicken Coop Door Jammed Notification
+ *
+ *
+ *  Modifed by D. England, changed icons, changed name
+ *
+ *
+ *
+ *
+ *  Copyright 2015 John Rucker
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+ */
+ 
+definition(
+    name: "Chicken Coop Door Jammed Notification",
+    namespace: "englanddh2",
+    author: "Don England",
+    description: "Sends a SmartThings notification and text messages when your Telguard Chicken Coop Door Opener detects a door jam.",
+    category: "Outdoor",
+    iconUrl: "http://cdn.device-icons.smartthings.com/Outdoor/outdoor20-icn.png",
+    iconX2Url: "http://cdn.device-icons.smartthings.com/Outdoor/outdoor20-icn@2x.png",
+    iconX3Url: "http://cdn.device-icons.smartthings.com/Outdoor/outdoor20-icn@3x.png")
+
+preferences {
+    section("When the door state changes") {
+        paragraph "Send a notification when the coop's door jammed and did not close."
+		input "doorSensor", "capability.doorControl", title: "Select Chicken Coop Door Opener", required: true, multiple: false            
+        input("recipients", "contact", title: "Recipients", description: "Send notifications to") {
+        	input "phone", "phone", title: "Phone number?", required: true}
+	}
+}
+
+def installed() {
+	log.debug "Installed with settings: ${settings}"
+	initialize()
+}
+
+def updated() {
+	log.debug "Updated with settings: ${settings}"
+	unsubscribe()
+	initialize()
+}
+
+def initialize() {
+	subscribe(doorSensor, "doorState", coopDoorStateHandler)
+}
+
+def coopDoorStateHandler(evt) {
+	if (evt.value == "jammed"){
+        def msg = "WARNING ${doorSensor.displayName} door is jammed and did not close!"
+        log.debug "WARNING ${doorSensor.displayName} door is jammed and did not close, texting $phone"
+
+        if (location.contactBookEnabled) {
+            sendNotificationToContacts(msg, recipients)
+        }
+        else {
+            sendPush(msg)
+            if (phone) {
+                sendSms(phone, msg)
+            }
+        }
+	}        
+}
